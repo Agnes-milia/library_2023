@@ -49,6 +49,8 @@ Route::middleware('auth.basic')->group(function () {
     //moreLendings($copy_id, $db)
     Route::get('more_lendings/{copy_id}/{db}', [CopyController::class, 'moreLendings']);
     Route::get('books_back', [LendingController::class, 'booksBack']);
+    //try to insert lendings
+    Route::post("lending_insert_try/{copy_id}", [LendingController::class, 'lendingInsertTry']);
     //trigger és társai
     Route::patch('bring_back/{copy_id}/{start}', [LendingController::class, 'bringBack']);
 });

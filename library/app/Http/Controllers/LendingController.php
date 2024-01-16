@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class LendingController extends Controller
 {
@@ -107,6 +108,31 @@ class LendingController extends Controller
         ->where('copy_id', $copy_id)
         ->update(['status' => 0]); */
         DB::select('CALL toStore(?)', array($copy_id));
+    }
+
+    public function lendingInsertTry($copy_id){
+        $user = Auth::user();
+        try { 
+            // Próbáld meg beszúrni a rekordot 
+            DB::table('lendings')->insert([ 
+                'user_id' => $user->id, 
+                'copy_id' => $copy_id, 
+                'start' => date(now()),
+                'extension' => 0,
+                'notice' => 0
+            ]);  
+        } 
+        catch (QueryException $e) { 
+            // Ha kivétel történik (például az egyediségi megsértése), akkor itt kezeld 
+            if ($e->errorInfo[1] == 1062) { // 1062 az egyediségi megsértés hibakódja MySQL-ben 
+                echo "A rekord már létezik a táblában.";
+        //return redirect "/"; 
+            } else { 
+                // Más típusú kivétel esetén kezelheted őket itt 
+                echo "Hiba történt: " . $e->getMessage(); 
+            } 
+        } 
+        
     }
 
 }
